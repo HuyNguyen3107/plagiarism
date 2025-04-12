@@ -3,7 +3,7 @@ import axios from "axios";
 import FileUpload from "./components/FileUpload";
 import { pdfjs } from "react-pdf";
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.mjs`;
-// Define the type for a file object
+import natural from "natural";
 interface UploadedFile {
   id: number;
   name: string;
@@ -45,8 +45,13 @@ const App: React.FC = () => {
       for (let pageNumber = 1; pageNumber <= numPages; pageNumber++) {
         const page = await pdf.getPage(pageNumber);
         const textContent = await page.getTextContent();
-        console.log(textContent);
+        // console.log(textContent);
       }
+      const distance = natural.JaroWinklerDistance(
+        "hello world",
+        "hello there"
+      );
+      console.log(distance);
       setFiles(data);
     } catch (error) {
       console.error("Error fetching files:", error);
