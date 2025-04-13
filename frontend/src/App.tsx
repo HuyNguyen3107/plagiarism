@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import FileUpload from "./components/FileUpload";
-import { pdfjs } from "react-pdf";
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.mjs`;
-import natural from "natural";
+import similarity from "similarity";
+import pdfUtil from "./utils/pdf";
 interface UploadedFile {
   id: number;
   name: string;
@@ -38,20 +37,14 @@ const App: React.FC = () => {
       const file = new File([blob], data[0].name, {
         type: "application/pdf",
       });
-      const blobURL = URL.createObjectURL(file);
-      const loadingTask = pdfjs.getDocument(blobURL);
-      const pdf = await loadingTask.promise;
-      const numPages = pdf.numPages;
-      for (let pageNumber = 1; pageNumber <= numPages; pageNumber++) {
-        const page = await pdf.getPage(pageNumber);
-        const textContent = await page.getTextContent();
-        // console.log(textContent);
-      }
-      const distance = natural.JaroWinklerDistance(
-        "hello world",
-        "hello there"
-      );
-      console.log(distance);
+
+      const pdfContent = await pdfUtil.getInfoArrFromFile(file);
+
+      const temp: string = pdfUtil.getPDFContent(pdfContent);
+      const other: string = pdfUtil.getPDFContent(pdfContent);
+      const similarityScore = similarity(temp, other);
+      console.log("Similarity Score:", similarityScore);
+
       setFiles(data);
     } catch (error) {
       console.error("Error fetching files:", error);
